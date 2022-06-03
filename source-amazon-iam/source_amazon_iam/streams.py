@@ -21,7 +21,7 @@ class UserGroups(AmazonIamStream):
         stream_state: Mapping[str, Any] = None,
     ):
         response = self.client.list_groups_for_user(
-            UserName='Augan',
+            UserName=stream_slice["user_name"],
             # Marker='string',
             MaxItems=123
         )
@@ -31,4 +31,6 @@ class UserGroups(AmazonIamStream):
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
     ):  # TODO
-        pass
+        return [
+            {"user_name": "Augan"},
+        ]
