@@ -2,10 +2,12 @@
 # Copyright (c) 2022 Airbyte, Inc., all rights reserved.
 #
 
-
 import json
+import logging
 from datetime import datetime
-from typing import Dict, Generator
+from typing import Dict, Generator, Tuple, Optional, Any, Mapping
+import boto3
+import botocore
 
 from airbyte_cdk.logger import AirbyteLogger
 from airbyte_cdk.models import (
@@ -18,28 +20,24 @@ from airbyte_cdk.models import (
     Status,
     Type,
 )
-from airbyte_cdk.sources import Source
+from airbyte_cdk.sources import AbstractSource
 
 
-class SourceAmazonIam(Source):
-    def check(self, logger: AirbyteLogger, config: json) -> AirbyteConnectionStatus:
-        """
-        Tests if the input configuration can be used to successfully connect to the integration
-            e.g: if a provided Stripe API token can be used to connect to the Stripe API.
+class SourceAmazonIam(AbstractSource):
 
-        :param logger: Logging object to display debug/info/error to the logs
-            (logs will not be accessible via airbyte UI if they are not passed to this logger)
-        :param config: Json object containing the configuration of this source, content of this json is as specified in
-        the properties of the spec.yaml file
-
-        :return: AirbyteConnectionStatus indicating a Success or Failure
-        """
+    def check_connection(self, logger: logging.Logger, config: Mapping[str, Any]) -> Tuple[bool, Optional[Any]]:
+        client = boto3.client(
+            'iam',
+            aws_access_key_id=config["aws_access_key_id"],
+            aws_secret_access_key=config["aws_secret_access_key"],
+        )
         try:
-            # Not Implemented
-
-            return AirbyteConnectionStatus(status=Status.SUCCEEDED)
-        except Exception as e:
-            return AirbyteConnectionStatus(status=Status.FAILED, message=f"An exception occurred: {str(e)}")
+            client.list_groups(
+                MaxItems=10
+            )
+            return True, None
+        except botocore.exceptions.ClientError as ex:
+            return False, str(ex)
 
     def discover(self, logger: AirbyteLogger, config: json) -> AirbyteCatalog:
         """
@@ -103,3 +101,6 @@ class SourceAmazonIam(Source):
             type=Type.RECORD,
             record=AirbyteRecordMessage(stream=stream_name, data=data, emitted_at=int(datetime.now().timestamp()) * 1000),
         )
+
+    def streams(self, config: Mapping[str, Any]):
+        return []
