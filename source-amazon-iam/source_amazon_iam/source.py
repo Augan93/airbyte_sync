@@ -6,7 +6,6 @@ import json
 import logging
 from datetime import datetime
 from typing import Dict, Generator, Tuple, Optional, Any, Mapping
-import boto3
 import botocore
 
 from airbyte_cdk.logger import AirbyteLogger
@@ -21,16 +20,13 @@ from airbyte_cdk.models import (
     Type,
 )
 from airbyte_cdk.sources import AbstractSource
+from .amazon_client import get_amazon_iam_client
 
 
 class SourceAmazonIam(AbstractSource):
 
     def check_connection(self, logger: logging.Logger, config: Mapping[str, Any]) -> Tuple[bool, Optional[Any]]:
-        client = boto3.client(
-            'iam',
-            aws_access_key_id=config["aws_access_key_id"],
-            aws_secret_access_key=config["aws_secret_access_key"],
-        )
+        client = get_amazon_iam_client(config)
         try:
             client.list_groups(
                 MaxItems=10
