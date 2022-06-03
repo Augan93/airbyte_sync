@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: source-amazon-iam
+Version: 0.0.0
+Summary: Source implementation for Amazon Iam.
+Author: Airbyte
+Author-email: contact@airbyte.io
+License: UNKNOWN
+Platform: UNKNOWN
+Provides-Extra: tests
+
+UNKNOWN
+
