@@ -27,3 +27,8 @@ class UserGroups(AmazonIamStream):
         )
         for group in response["Groups"]:
             yield group
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):  # TODO
+        pass
