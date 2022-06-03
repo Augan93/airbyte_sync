@@ -2,3 +2,4 @@ work_files/*
 temporal/*
 .venv/*
 secrets
+.idea/*
