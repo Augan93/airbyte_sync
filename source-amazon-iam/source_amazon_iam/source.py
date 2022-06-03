@@ -9,6 +9,7 @@ import botocore
 
 from airbyte_cdk.sources import AbstractSource
 from .amazon_client import get_amazon_iam_client
+from .streams import UserGroups
 
 
 class SourceAmazonIam(AbstractSource):
@@ -24,4 +25,7 @@ class SourceAmazonIam(AbstractSource):
             return False, str(ex)
 
     def streams(self, config: Mapping[str, Any]):
-        return []
+        client = get_amazon_iam_client(config)
+        return [
+            UserGroups(client=client)
+        ]

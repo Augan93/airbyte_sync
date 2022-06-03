@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "Path": {
+      "type": ["string"]
+    },
+    "GroupName": {
+      "type": ["string"]
+    },
+    "GroupId": {
+      "type": ["string"]
+    },
+    "Arn": {
+      "type": ["string"]
+    },
+    "CreateDate": {
+      "type": ["string"],
+      "format": "date-time"
+    }
+  }
+}
