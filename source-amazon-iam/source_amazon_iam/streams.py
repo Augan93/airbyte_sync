@@ -145,3 +145,12 @@ class UserAttachedPolicies(AmazonIamStream):
                 "user_name": user["UserName"],
                 "user_id": user["UserId"]
             }
+
+
+class Groups(AmazonIamStream):
+    primary_key = None
+    field = "Groups"
+
+    def read(self, **kwargs):
+        kwargs.pop("stream_slice")
+        return self.client.list_groups(**kwargs)
