@@ -60,7 +60,6 @@ class UserGroups(AmazonIamStream):
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
     ):  # TODO
-
-        return [
-            {"user_name": "Augan"},
-        ]
+        users = Users(client=self.client)
+        for user in users.read_records(sync_mode=SyncMode.full_refresh):
+            yield {"user_name": user["UserName"]}
