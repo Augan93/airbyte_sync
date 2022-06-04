@@ -11,7 +11,7 @@ class AmazonIamStream(Stream, ABC):
 
     @property
     @abstractmethod
-    def response_key(self):
+    def field(self):
         pass
 
     @abstractmethod
@@ -37,7 +37,7 @@ class AmazonIamStream(Stream, ABC):
                 kwargs.update(Marker=marker)
 
             response = self.read(**kwargs)
-            for record in response[self.response_key]:
+            for record in response[self.field]:
                 yield record
 
             if response["IsTruncated"]:
@@ -48,7 +48,7 @@ class AmazonIamStream(Stream, ABC):
 
 class Users(AmazonIamStream):
     primary_key = None
-    response_key = "Users"
+    field = "Users"
 
     def read(self, **kwargs):
         kwargs.pop("stream_slice")
@@ -57,7 +57,7 @@ class Users(AmazonIamStream):
 
 class UserGroups(AmazonIamStream):
     primary_key = None
-    response_key = "Groups"
+    field = "Groups"
 
     def read(self, **kwargs):
         stream_slice = kwargs.pop("stream_slice")
@@ -66,7 +66,7 @@ class UserGroups(AmazonIamStream):
             UserName=stream_slice["user_name"],
             **kwargs,
         )
-        for record in response[self.response_key]:
+        for record in response[self.field]:
             record.update({"UserName": stream_slice["user_name"]})
         return response
 
