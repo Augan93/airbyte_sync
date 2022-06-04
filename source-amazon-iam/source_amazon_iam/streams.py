@@ -9,9 +9,14 @@ class AmazonIamStream(Stream, ABC):
     def __init__(self, client):
         self.client = client
 
+    @property
+    @abstractmethod
+    def response_key(self):
+        pass
 
-class Users(AmazonIamStream):
-    primary_key = None
+    @abstractmethod
+    def read(self, **kwargs):
+        pass
 
     def read_records(
         self,
@@ -23,15 +28,17 @@ class Users(AmazonIamStream):
         pagination_complete = False
         marker = None
         while not pagination_complete:
-            kwags = {
+            kwargs = {
                 # "PathPrefix": "string",
                 "MaxItems": 1,
+                "stream_slice": stream_slice,
             }
             if marker:
-                kwags.update(Marker=marker)
-            response = self.client.list_users(**kwags)
-            for user in response["Users"]:
-                yield user
+                kwargs.update(Marker=marker)
+
+            response = self.read(**kwargs)
+            for record in response[self.response_key]:
+                yield record
 
             if response["IsTruncated"]:
                 marker = response["Marker"]
@@ -39,27 +46,29 @@ class Users(AmazonIamStream):
                 pagination_complete = True
 
 
+class Users(AmazonIamStream):
+    primary_key = None
+    response_key = "Users"
+
+    def read(self, **kwargs):
+        kwargs.pop("stream_slice")
+        return self.client.list_users(**kwargs)
+
+
 class UserGroups(AmazonIamStream):
     primary_key = None
+    response_key = "Groups"
 
-    def read_records(
-        self,
-        sync_mode: SyncMode,
-        cursor_field: List[str] = None,
-        stream_slice: Mapping[str, Any] = None,
-        stream_state: Mapping[str, Any] = None,
-    ):
-        response = self.client.list_groups_for_user(
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        return self.client.list_groups_for_user(
             UserName=stream_slice["user_name"],
-            # Marker='string',
-            MaxItems=1
+            **kwargs,
         )
-        for group in response["Groups"]:
-            yield group
 
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
-    ):  # TODO
+    ):
         users = Users(client=self.client)
         for user in users.read_records(sync_mode=SyncMode.full_refresh):
             yield {"user_name": user["UserName"]}
