@@ -10,6 +10,35 @@ class AmazonIamStream(Stream, ABC):
         self.client = client
 
 
+class Users(AmazonIamStream):
+    primary_key = None
+
+    def read_records(
+        self,
+        sync_mode: SyncMode,
+        cursor_field: List[str] = None,
+        stream_slice: Mapping[str, Any] = None,
+        stream_state: Mapping[str, Any] = None,
+    ):
+        pagination_complete = False
+        marker = None
+        while not pagination_complete:
+            kwags = {
+                # "PathPrefix": "string",
+                "MaxItems": 1,
+            }
+            if marker:
+                kwags.update(Marker=marker)
+            response = self.client.list_users(**kwags)
+            for user in response["Users"]:
+                yield user
+
+            if response["IsTruncated"]:
+                marker = response["Marker"]
+            else:
+                pagination_complete = True
+
+
 class UserGroups(AmazonIamStream):
     primary_key = None
 
@@ -23,7 +52,7 @@ class UserGroups(AmazonIamStream):
         response = self.client.list_groups_for_user(
             UserName=stream_slice["user_name"],
             # Marker='string',
-            MaxItems=123
+            MaxItems=1
         )
         for group in response["Groups"]:
             yield group
@@ -31,6 +60,7 @@ class UserGroups(AmazonIamStream):
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
     ):  # TODO
+
         return [
             {"user_name": "Augan"},
         ]
