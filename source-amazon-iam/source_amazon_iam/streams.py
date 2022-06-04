@@ -156,7 +156,7 @@ class Groups(AmazonIamStream):
         return self.client.list_groups(**kwargs)
 
 
-class GroupPolicies(AmazonIamStream):  # TODO
+class GroupPolicies(AmazonIamStream):
     """Inline policies attached to groups"""
     primary_key = None
     field = "PolicyNames"
