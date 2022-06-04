@@ -76,3 +76,12 @@ class UserGroups(AmazonIamStream):
         users = Users(client=self.client)
         for user in users.read_records(sync_mode=SyncMode.full_refresh):
             yield {"user_name": user["UserName"]}
+
+
+class Roles(AmazonIamStream):
+    primary_key = None
+    field = "Roles"
+
+    def read(self, **kwargs):
+        kwargs.pop("stream_slice")
+        return self.client.list_roles(**kwargs)
