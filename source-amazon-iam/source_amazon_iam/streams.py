@@ -87,7 +87,7 @@ class Roles(AmazonIamStream):
         return self.client.list_roles(**kwargs)
 
 
-class RoleAttachedPolicies(AmazonIamStream):  # TODO
+class RoleAttachedPolicies(AmazonIamStream):
     primary_key = None
     field = "AttachedPolicies"
 
@@ -115,4 +115,33 @@ class RoleAttachedPolicies(AmazonIamStream):  # TODO
             yield {
                 "role_name": role["RoleName"],
                 "role_id": role["RoleId"]
+            }
+
+
+class UserAttachedPolicies(AmazonIamStream):
+    primary_key = None
+    field = "AttachedPolicies"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+
+        response = self.client.list_attached_user_policies(
+            UserName=stream_slice["user_name"],
+            **kwargs
+        )
+        for record in response[self.field]:
+            record.update({
+                "UserName": stream_slice["user_name"],
+                "UserId": stream_slice["user_id"],
+            })
+        return response
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):
+        users = Users(client=self.client)
+        for user in users.read_records(sync_mode=SyncMode.full_refresh):
+            yield {
+                "user_name": user["UserName"],
+                "user_id": user["UserId"]
             }
