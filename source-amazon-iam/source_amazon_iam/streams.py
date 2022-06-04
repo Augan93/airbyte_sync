@@ -85,3 +85,34 @@ class Roles(AmazonIamStream):
     def read(self, **kwargs):
         kwargs.pop("stream_slice")
         return self.client.list_roles(**kwargs)
+
+
+class RoleAttachedPolicies(AmazonIamStream):  # TODO
+    primary_key = None
+    field = "AttachedPolicies"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        role_name = stream_slice["role_name"]
+        role_id = stream_slice["role_id"]
+
+        response = self.client.list_attached_role_policies(
+            RoleName=role_name,
+            **kwargs,
+        )
+        for record in response[self.field]:
+            record.update({
+                "RoleName": role_name,
+                "RoleId": role_id,
+            })
+        return response
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):
+        roles = Roles(client=self.client)
+        for role in roles.read_records(sync_mode=SyncMode.full_refresh):
+            yield {
+                "role_name": role["RoleName"],
+                "role_id": role["RoleId"]
+            }
