@@ -61,10 +61,14 @@ class UserGroups(AmazonIamStream):
 
     def read(self, **kwargs):
         stream_slice = kwargs.pop("stream_slice")
-        return self.client.list_groups_for_user(
+
+        response = self.client.list_groups_for_user(
             UserName=stream_slice["user_name"],
             **kwargs,
         )
+        for record in response[self.response_key]:
+            record.update({"UserName": stream_slice["user_name"]})
+        return response
 
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None

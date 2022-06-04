@@ -17,6 +17,9 @@
     "CreateDate": {
       "type": ["string"],
       "format": "date-time"
+    },
+    "UserName": {
+      "type": ["string"]
     }
   }
 }
