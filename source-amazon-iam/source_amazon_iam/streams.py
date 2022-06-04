@@ -154,3 +154,36 @@ class Groups(AmazonIamStream):
     def read(self, **kwargs):
         kwargs.pop("stream_slice")
         return self.client.list_groups(**kwargs)
+
+
+class GroupPolicies(AmazonIamStream):  # TODO
+    """Inline policies attached to groups"""
+    primary_key = None
+    field = "PolicyNames"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.list_group_policies(
+            GroupName=stream_slice["group_name"],
+            **kwargs
+        )
+        policy_names = response[self.field]
+        new_policy_names = []
+        for policy_name in policy_names:
+            new_policy_names.append({
+                "Name": policy_name,
+                "GroupName": stream_slice["group_name"],
+                "GroupId": stream_slice["group_id"]
+            })
+        response[self.field] = new_policy_names
+        return response
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):
+        groups = Groups(client=self.client)
+        for group in groups.read_records(sync_mode=SyncMode.full_refresh):
+            yield {
+                "group_name": group["GroupName"],
+                "group_id": group["GroupId"]
+            }

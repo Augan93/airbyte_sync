@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "Name": {
+      "type": ["string"]
+    },
+    "GroupName": {
+      "type": ["string"]
+    },
+    "GroupId": {
+      "type": ["string"]
+    }
+  }
+}
