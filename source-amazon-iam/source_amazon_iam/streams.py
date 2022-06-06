@@ -251,14 +251,12 @@ class PolicyAttachedEntities(AmazonIamStream):
 
         entities = groups + users + roles
 
-        new_entities = []
         for entity in entities:
             entity.update({"PolicyName": stream_slice["policy_name"],
                            "PolicyId": stream_slice["policy_id"],
                            "PolicyArn": stream_slice["policy_arn"]})
-            new_entities.append(entity)
 
-        new_response[self.field] = new_entities
+        new_response[self.field] = entities
         return new_response
 
     def stream_slices(
