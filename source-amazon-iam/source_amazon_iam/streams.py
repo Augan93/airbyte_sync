@@ -222,3 +222,52 @@ class ManagedPolicies(AmazonIamStream):
             OnlyAttached=True,
         )
 
+
+class PolicyAttachedEntities(AmazonIamStream):
+
+    primary_key = None
+    field = "Entities"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.list_entities_for_policy(
+            PolicyArn=stream_slice["policy_arn"],
+        )
+
+        new_response = dict(response)
+        groups = new_response.pop("PolicyGroups")
+        users = new_response.pop("PolicyUsers")
+        roles = new_response.pop("PolicyRoles")
+
+        groups = [{"EntityType": "Group",
+                   "EntityName": group["GroupName"],
+                   "EntityId": group["GroupId"]} for group in groups]
+        users = [{"EntityType": "User",
+                  "EntityName": user["UserName"],
+                  "EntityId": user["UserId"]} for user in users]
+        roles = [{"EntityType": "Role",
+                  "EntityName": role["RoleName"],
+                  "EntityId": role["RoleId"]} for role in roles]
+
+        entities = groups + users + roles
+
+        new_entities = []
+        for entity in entities:
+            entity.update({"PolicyName": stream_slice["policy_name"],
+                           "PolicyId": stream_slice["policy_id"],
+                           "PolicyArn": stream_slice["policy_arn"]})
+            new_entities.append(entity)
+
+        new_response[self.field] = new_entities
+        return new_response
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):
+        policies = ManagedPolicies(client=self.client)
+        for policy in policies.read_records(sync_mode=SyncMode.full_refresh):
+            yield {
+                "policy_name": policy["PolicyName"],
+                "policy_id": policy["PolicyId"],
+                "policy_arn": policy["Arn"]
+            }

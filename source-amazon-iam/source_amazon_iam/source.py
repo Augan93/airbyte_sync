@@ -19,6 +19,7 @@ from .streams import (
     GroupPolicies,
     GroupUsers,
     ManagedPolicies,
+    PolicyAttachedEntities,
 )
 
 
@@ -46,4 +47,5 @@ class SourceAmazonIam(AbstractSource):
             GroupPolicies(client=client),
             GroupUsers(client=client),
             ManagedPolicies(client=client),
+            PolicyAttachedEntities(client=client),
         ]
