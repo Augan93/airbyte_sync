@@ -269,3 +269,51 @@ class PolicyAttachedEntities(AmazonIamStream):
                 "policy_id": policy["PolicyId"],
                 "policy_arn": policy["Arn"]
             }
+
+
+def get_user_inline_policies(client, user_name: str) -> List[str]:  # TODO implement pagination
+    """
+    Lists the names of the inline policies embedded in the specified IAM user.
+    """
+    response = client.list_user_policies(
+        UserName=user_name,
+        MaxItems=123,
+    )
+    return response["PolicyNames"]
+
+
+class UserPolicies(AmazonIamStream):
+    """
+    Get user's inline policy document
+    """
+    primary_key = None
+    field = "UserPolicy"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.get_user_policy(
+            UserName=stream_slice["user_name"],
+            PolicyName=stream_slice["policy_name"]  # get inline policy name from the above response
+        )
+        new_response = dict(response)
+        new_response[self.field] = [
+            {
+                'UserName': new_response.pop("UserName"),
+                'PolicyName': new_response.pop("PolicyName"),
+                'PolicyDocument': new_response.pop("PolicyDocument")
+            }
+        ]
+        new_response["IsTruncated"] = False
+        return new_response
+
+    def stream_slices(
+        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
+    ):
+        users = Users(client=self.client)
+        for user in users.read_records(sync_mode=SyncMode.full_refresh):
+            inline_policies = get_user_inline_policies(self.client, user["UserName"])
+            for policy in inline_policies:
+                yield {
+                    "user_name": user["UserName"],
+                    "policy_name": policy,
+                }
