@@ -205,3 +205,20 @@ class GroupUsers(GroupPolicies):
             record["GroupName"] = stream_slice["group_name"]
             record["GroupId"] = stream_slice["group_id"]
         return response
+
+
+class ManagedPolicies(AmazonIamStream):
+    """
+    Lists all the managed policies that are available in your Amazon Web Services account, including your own c
+    ustomer-defined managed policies and all Amazon Web Services managed policies.
+    """
+    primary_key = None
+    field = "Policies"
+
+    def read(self, **kwargs):
+        kwargs.pop("stream_slice")
+        return self.client.list_policies(
+            Scope='All',
+            OnlyAttached=True,
+        )
+
