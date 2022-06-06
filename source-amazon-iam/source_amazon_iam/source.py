@@ -9,7 +9,16 @@ import botocore
 
 from airbyte_cdk.sources import AbstractSource
 from .amazon_client import get_amazon_iam_client
-from .streams import UserGroups, Users, Roles, RoleAttachedPolicies, UserAttachedPolicies, Groups, GroupPolicies
+from .streams import (
+    UserGroups,
+    Users,
+    Roles,
+    RoleAttachedPolicies,
+    UserAttachedPolicies,
+    Groups,
+    GroupPolicies,
+    GroupUsers,
+)
 
 
 class SourceAmazonIam(AbstractSource):
@@ -34,4 +43,5 @@ class SourceAmazonIam(AbstractSource):
             UserAttachedPolicies(client=client),
             Groups(client=client),
             GroupPolicies(client=client),
+            GroupUsers(client=client),
         ]

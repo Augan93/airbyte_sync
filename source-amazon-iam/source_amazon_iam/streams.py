@@ -187,3 +187,21 @@ class GroupPolicies(AmazonIamStream):
                 "group_name": group["GroupName"],
                 "group_id": group["GroupId"]
             }
+
+
+class GroupUsers(GroupPolicies):
+    """
+    Returns a list of IAM users that are in the specified IAM group
+    """
+    field = "Users"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.get_group(
+            GroupName=stream_slice["group_name"],
+            **kwargs
+        )
+        for record in response[self.field]:
+            record["GroupName"] = stream_slice["group_name"]
+            record["GroupId"] = stream_slice["group_id"]
+        return response
