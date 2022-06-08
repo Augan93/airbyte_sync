@@ -1,3 +1,7 @@
+import time
+import io
+import csv
+
 from abc import ABC, abstractmethod
 from typing import List, Mapping, Any, Generator
 
@@ -356,3 +360,40 @@ class UserServiceCredentials(UserGroups):
             UserName=stream_slice["user_name"],
         )
         return response
+
+
+class CredentialReports(Stream):
+    primary_key = None
+    WAIT_TIME = 1  # seconds
+
+    def __init__(self, client):
+        self.client = client
+
+    def generate_report(self):
+        while True:
+            response = self.client.generate_credential_report()
+            if response["State"] == "COMPLETE":
+                return True
+            time.sleep(self.WAIT_TIME)
+
+    @staticmethod
+    def read_csv(content):
+        f = io.StringIO(content.decode("utf-8"))
+        reader = csv.DictReader(f)
+        for row in reader:
+            yield row
+
+    def read_records(
+        self,
+        sync_mode: SyncMode,
+        cursor_field: List[str] = None,
+        stream_slice: Mapping[str, Any] = None,
+        stream_state: Mapping[str, Any] = None,
+    ):
+        self.generate_report()
+        response = self.client.get_credential_report()
+        content = response["Content"]
+        for record in self.read_csv(content):
+            yield record
+
+
