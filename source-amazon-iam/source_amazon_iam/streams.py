@@ -274,6 +274,9 @@ class PolicyAttachedEntities(AmazonIamStream):
 
 
 class UserInlinePolicyList(AmazonIamStream):
+    """
+    Lists the names of the inline policies embedded in the specified IAM user.
+    """
     primary_key = None
     field = "PolicyNames"
 
