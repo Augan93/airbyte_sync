@@ -8,6 +8,7 @@ from setuptools import find_packages, setup
 MAIN_REQUIREMENTS = [
     "airbyte-cdk~=0.1.56",
     "boto3~=1.24.2",
+    "pendulum"
 ]
 
 TEST_REQUIREMENTS = [

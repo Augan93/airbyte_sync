@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "Path": {
+      "type": ["string"]
+    },
+    "InstanceProfileName": {
+      "type": ["string"]
+    },
+    "InstanceProfileId": {
+      "type": ["string"]
+    },
+    "Arn": {
+      "type": ["string"]
+    },
+    "CreateDate": {
+      "type": ["string"],
+      "format": "date-time"
+    },
+    "Roles": {
+      "type": ["null", "array"],
+      "items": {
+        "type": ["null", "object"],
+        "properties": {
+          "Path": {
+            "type": ["string"]
+          },
+          "RoleName": {
+            "type": ["string"]
+          },
+          "RoleId": {
+            "type": ["string"]
+          },
+          "Arn": {
+            "type": ["string"]
+          },
+          "CreateDate": {
+            "type": ["string"],
+            "format": "date-time"
+          },
+          "Description": {
+            "type": ["null", "string"]
+          },
+          "MaxSessionDuration": {
+            "type": ["null", "integer"]
+          },
+          "AssumeRolePolicyDocument": {
+            "type": ["null", "object"],
+            "properties": {
+              "Version": {
+                "type": ["string"]
+              },
+              "Statement": {
+                "type": ["null", "array"],
+                "items": {
+                  "type": ["null", "object"],
+                  "properties": {
+                    "Effect": {
+                      "type": ["string"]
+                    },
+                    "Principal": {
+                      "type": ["null", "object"],
+                      "properties": {
+                        "Service": {
+                          "type": ["string"]
+                        }
+                      }
+                    },
+                    "Action": {
+                      "type": ["string"]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

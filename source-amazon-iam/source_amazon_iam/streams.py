@@ -317,3 +317,15 @@ class UserPolicies(AmazonIamStream):
                     "user_name": user["UserName"],
                     "policy_name": policy,
                 }
+
+
+class RoleInstanceProfiles(RoleAttachedPolicies):
+    primary_key = None
+    field = "InstanceProfiles"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.list_instance_profiles_for_role(
+            RoleName=stream_slice["role_name"],
+        )
+        return response
