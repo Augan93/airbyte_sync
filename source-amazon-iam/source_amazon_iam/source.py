@@ -22,6 +22,7 @@ from .streams import (
     PolicyAttachedEntities,
     UserPolicies,
     RoleInstanceProfiles,
+    UserServiceCredentials,
 )
 
 
@@ -52,4 +53,5 @@ class SourceAmazonIam(AbstractSource):
             PolicyAttachedEntities(client=client),
             UserPolicies(client=client),
             RoleInstanceProfiles(client=client),
+            UserServiceCredentials(client=client),
         ]

@@ -3,3 +3,4 @@ temporal/*
 .venv/*
 secrets
 .idea/*
+configured_catalog_min.json

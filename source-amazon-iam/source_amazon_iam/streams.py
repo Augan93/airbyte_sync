@@ -40,7 +40,7 @@ class AmazonIamStream(Stream, ABC):
             for record in response[self.field]:
                 yield record
 
-            if response["IsTruncated"]:
+            if response.get("IsTruncated"):
                 marker = response["Marker"]
             else:
                 pagination_complete = True
@@ -327,5 +327,19 @@ class RoleInstanceProfiles(RoleAttachedPolicies):
         stream_slice = kwargs.pop("stream_slice")
         response = self.client.list_instance_profiles_for_role(
             RoleName=stream_slice["role_name"],
+            **kwargs
+        )
+        return response
+
+
+class UserServiceCredentials(UserGroups):
+    primary_key = None
+    field = "ServiceSpecificCredentials"
+
+    def read(self, **kwargs):
+        stream_slice = kwargs.pop("stream_slice")
+        response = self.client.list_service_specific_credentials(
+            UserName=stream_slice["user_name"],
+            **kwargs
         )
         return response
