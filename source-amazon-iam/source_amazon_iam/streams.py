@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Mapping, Any
+from typing import List, Mapping, Any, Generator
 
 from airbyte_cdk.sources.streams import Stream
 from airbyte_cdk.models import AirbyteStream, SyncMode
@@ -273,15 +273,30 @@ class PolicyAttachedEntities(AmazonIamStream):
             }
 
 
-def get_user_inline_policies(client, user_name: str) -> List[str]:  # TODO implement pagination
+def get_user_inline_policies(client, user_name: str) -> Generator[str]:  # TODO implement pagination
     """
     Lists the names of the inline policies embedded in the specified IAM user.
     """
-    response = client.list_user_policies(
-        UserName=user_name,
-        MaxItems=123,
-    )
-    return response["PolicyNames"]
+    pagination_complete = False
+    marker = None
+    while not pagination_complete:
+        kwargs = {
+            "UserName": user_name,
+            "MaxItems": 20
+        }
+        if marker:
+            kwargs.update(Marker=marker)
+
+        response = client.list_user_policies(**kwargs)
+        for record in response["PolicyNames"]:
+            yield record
+
+        if response.get("IsTruncated"):
+            marker = response["Marker"]
+        else:
+            pagination_complete = True
+
+        # return response["PolicyNames"]
 
 
 class UserPolicies(AmazonIamStream):
