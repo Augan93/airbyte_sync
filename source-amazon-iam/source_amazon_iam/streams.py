@@ -30,7 +30,7 @@ class AmazonIamStream(Stream, ABC):
         while not pagination_complete:
             kwargs = {
                 # "PathPrefix": "string",
-                "MaxItems": 1,
+                "MaxItems": 50,
                 "stream_slice": stream_slice,
             }
             if marker:
@@ -273,30 +273,21 @@ class PolicyAttachedEntities(AmazonIamStream):
             }
 
 
-def get_user_inline_policies(client, user_name: str) -> Generator[str]:  # TODO implement pagination
-    """
-    Lists the names of the inline policies embedded in the specified IAM user.
-    """
-    pagination_complete = False
-    marker = None
-    while not pagination_complete:
-        kwargs = {
-            "UserName": user_name,
-            "MaxItems": 20
-        }
-        if marker:
-            kwargs.update(Marker=marker)
+class UserInlinePolicyList(AmazonIamStream):
+    primary_key = None
+    field = "PolicyNames"
 
-        response = client.list_user_policies(**kwargs)
-        for record in response["PolicyNames"]:
-            yield record
+    def __init__(self, client, user_name: str):
+        super().__init__(client=client)
+        self.user_name = user_name
 
-        if response.get("IsTruncated"):
-            marker = response["Marker"]
-        else:
-            pagination_complete = True
-
-        # return response["PolicyNames"]
+    def read(self, **kwargs):
+        kwargs.pop("stream_slice")
+        response = self.client.list_user_policies(
+            UserName=self.user_name,
+            **kwargs
+        )
+        return response
 
 
 class UserPolicies(AmazonIamStream):
@@ -310,7 +301,7 @@ class UserPolicies(AmazonIamStream):
         stream_slice = kwargs.pop("stream_slice")
         response = self.client.get_user_policy(
             UserName=stream_slice["user_name"],
-            PolicyName=stream_slice["policy_name"]  # get inline policy name from the above response
+            PolicyName=stream_slice["policy_name"]  # get inline policy name from the Class above
         )
         new_response = dict(response)
         new_response[self.field] = [
@@ -328,11 +319,14 @@ class UserPolicies(AmazonIamStream):
     ):
         users = Users(client=self.client)
         for user in users.read_records(sync_mode=SyncMode.full_refresh):
-            inline_policies = get_user_inline_policies(self.client, user["UserName"])
-            for policy in inline_policies:
+            user_policy_list = UserInlinePolicyList(
+                client=self.client,
+                user_name=user["UserName"]
+            )
+            for policy_name in user_policy_list.read_records(sync_mode=SyncMode.full_refresh):
                 yield {
                     "user_name": user["UserName"],
-                    "policy_name": policy,
+                    "policy_name": policy_name,
                 }
 
 
