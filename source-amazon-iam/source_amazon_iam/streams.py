@@ -220,6 +220,7 @@ class ManagedPolicies(AmazonIamStream):
         return self.client.list_policies(
             Scope='All',
             OnlyAttached=True,
+            **kwargs
         )
 
 
@@ -232,6 +233,7 @@ class PolicyAttachedEntities(AmazonIamStream):
         stream_slice = kwargs.pop("stream_slice")
         response = self.client.list_entities_for_policy(
             PolicyArn=stream_slice["policy_arn"],
+            **kwargs
         )
 
         new_response = dict(response)
@@ -340,6 +342,5 @@ class UserServiceCredentials(UserGroups):
         stream_slice = kwargs.pop("stream_slice")
         response = self.client.list_service_specific_credentials(
             UserName=stream_slice["user_name"],
-            **kwargs
         )
         return response
