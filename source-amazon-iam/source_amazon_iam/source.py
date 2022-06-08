@@ -24,6 +24,7 @@ from .streams import (
     RoleInstanceProfiles,
     UserServiceCredentials,
     CredentialReports,
+    OrganizationAccessReports,
 )
 
 
@@ -56,4 +57,5 @@ class SourceAmazonIam(AbstractSource):
             RoleInstanceProfiles(client=client),
             UserServiceCredentials(client=client),
             CredentialReports(client=client),
+            OrganizationAccessReports(client=client, config=config),
         ]

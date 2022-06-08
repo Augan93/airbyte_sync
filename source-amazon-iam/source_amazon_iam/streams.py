@@ -397,3 +397,65 @@ class CredentialReports(Stream):
             yield record
 
 
+class OrganizationAccessReports(Stream):  # TODO add orgID and org root Id to spec.yaml
+    primary_key = None
+    WAIT_TIME = 1  # seconds
+    field = "AccessDetails"
+
+    def __init__(self, client, config):
+        self.client = client
+        self.entity_path = config["entity_path"]
+
+    def generate_report(self) -> str:
+        response = self.client.generate_organizations_access_report(
+            EntityPath=self.entity_path,  # organizaton id / organization root id  : 'o-3uyr7cilip/r-clzw'
+            # OrganizationsPolicyId='string'
+        )
+        return response["JobId"]
+
+    def get_report(self, **kwargs):
+        while True:
+            response = self.client.get_organizations_access_report(
+                **kwargs,
+                # JobId=job_id,
+                # MaxItems=123,
+                # Marker='string',
+                # SortKey='SERVICE_NAMESPACE_ASCENDING' | 'SERVICE_NAMESPACE_DESCENDING' | 'LAST_AUTHENTICATED_TIME_ASCENDING' | 'LAST_AUTHENTICATED_TIME_DESCENDING'
+            )
+            if response["JobStatus"] == "IN_PROGRESS":
+                time.sleep(self.WAIT_TIME)
+            elif response["JobStatus"] == "COMPLETED":
+                return response
+            elif response["JobStatus"] == "FAILED":
+                return {
+                    self.field: [],
+                    "IsTruncated": False,
+                }
+
+    def read_records(
+        self,
+        sync_mode: SyncMode,
+        cursor_field: List[str] = None,
+        stream_slice: Mapping[str, Any] = None,
+        stream_state: Mapping[str, Any] = None,
+    ):
+        job_id = self.generate_report()
+
+        pagination_complete = False
+        marker = None
+        while not pagination_complete:
+            kwargs = {
+                "MaxItems": 100,
+                "JobId": job_id,
+            }
+            if marker:
+                kwargs.update(Marker=marker)
+
+            response = self.get_report(**kwargs)
+            for record in response[self.field]:
+                yield record
+
+            if response.get("IsTruncated"):
+                marker = response["Marker"]
+            else:
+                pagination_complete = True
