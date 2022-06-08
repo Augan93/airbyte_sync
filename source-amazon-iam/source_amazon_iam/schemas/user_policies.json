@@ -15,22 +15,25 @@
           "type": ["string"]
         },
         "Statement": {
-          "type": ["null", "object"],
-          "properties": {
-            "Sid": {
-              "type": ["string"]
-            },
-            "Effect": {
-              "type": ["string"]
-            },
-            "Action": {
-              "type": ["null", "array"],
-              "items": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "object"],
+            "properties": {
+              "Sid": {
+                "type": ["string"]
+              },
+              "Effect": {
+                "type": ["string"]
+              },
+              "Action": {
+                "type": ["null", "array"],
+                "items": {
+                  "type": ["null", "string"]
+                }
+              },
+              "Resource": {
                 "type": ["null", "string"]
               }
-            },
-            "Resource": {
-              "type": ["null", "string"]
             }
           }
         }
