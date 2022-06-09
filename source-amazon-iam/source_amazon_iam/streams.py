@@ -3,10 +3,10 @@ import io
 import csv
 
 from abc import ABC, abstractmethod
-from typing import List, Mapping, Any, Generator
+from typing import List, Mapping, Any
 
 from airbyte_cdk.sources.streams import Stream
-from airbyte_cdk.models import AirbyteStream, SyncMode
+from airbyte_cdk.models import SyncMode
 
 
 class AmazonIamStream(Stream, ABC):
@@ -79,7 +79,10 @@ class UserGroups(AmazonIamStream):
     ):
         users = Users(client=self.client)
         for user in users.read_records(sync_mode=SyncMode.full_refresh):
-            yield {"user_name": user["UserName"]}
+            yield {
+                "user_name": user["UserName"],
+                "user_id": user["UserId"]
+            }
 
 
 class Roles(AmazonIamStream):
@@ -122,7 +125,7 @@ class RoleAttachedPolicies(AmazonIamStream):
             }
 
 
-class UserAttachedPolicies(AmazonIamStream):
+class UserAttachedPolicies(UserGroups):
     primary_key = None
     field = "AttachedPolicies"
 
@@ -139,16 +142,6 @@ class UserAttachedPolicies(AmazonIamStream):
                 "UserId": stream_slice["user_id"],
             })
         return response
-
-    def stream_slices(
-        self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
-    ):
-        users = Users(client=self.client)
-        for user in users.read_records(sync_mode=SyncMode.full_refresh):
-            yield {
-                "user_name": user["UserName"],
-                "user_id": user["UserId"]
-            }
 
 
 class Groups(AmazonIamStream):
