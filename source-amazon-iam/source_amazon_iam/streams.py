@@ -397,31 +397,24 @@ class CredentialReports(Stream):
             yield record
 
 
-class OrganizationAccessReports(Stream):  # TODO add orgID and org root Id to spec.yaml
+class OrganizationAccessReports(Stream):
     primary_key = None
     WAIT_TIME = 1  # seconds
     field = "AccessDetails"
 
     def __init__(self, client, config):
         self.client = client
-        self.entity_path = config["entity_path"]
+        self.entity_path = f"{config['organization_id']}/{config['root_id']}"
 
     def generate_report(self) -> str:
         response = self.client.generate_organizations_access_report(
-            EntityPath=self.entity_path,  # organizaton id / organization root id  : 'o-3uyr7cilip/r-clzw'
-            # OrganizationsPolicyId='string'
+            EntityPath=self.entity_path,
         )
         return response["JobId"]
 
     def get_report(self, **kwargs):
         while True:
-            response = self.client.get_organizations_access_report(
-                **kwargs,
-                # JobId=job_id,
-                # MaxItems=123,
-                # Marker='string',
-                # SortKey='SERVICE_NAMESPACE_ASCENDING' | 'SERVICE_NAMESPACE_DESCENDING' | 'LAST_AUTHENTICATED_TIME_ASCENDING' | 'LAST_AUTHENTICATED_TIME_DESCENDING'
-            )
+            response = self.client.get_organizations_access_report(**kwargs)
             if response["JobStatus"] == "IN_PROGRESS":
                 time.sleep(self.WAIT_TIME)
             elif response["JobStatus"] == "COMPLETED":
