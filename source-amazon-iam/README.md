@@ -17,7 +17,7 @@ docker push <repo_owner>/source-amazon-iam:0.1.0
 
 #### Adding the source connector to Airbyte instance
 
-From the root of the repo, run
+From the root of the repo, run the following command to start airbyte instance:
 ```
 docker-compose up
 ```
@@ -38,10 +38,10 @@ Go to: Sources and press the button +New source
 In the search input, enter Amazon IAM to find our source connector.
 
 In the form fill out the following fields:
-1. aws_access_key_id      - access key for IAM user
-2. aws_secret_access_key  - secret key for IAM user
-3. organization_id        - Organization Id
-4. root_id                - Root Id (Root is the parent organizational unit (OU) for all accounts and other OUs in your organization)
+1. **aws_access_key_id**      - access key for IAM user
+2. **aws_secret_access_key**  - secret key for IAM user
+3. **organization_id**        - Organization Id
+4. **root_id**                - Root Id (Root is the parent organizational unit (OU) for all accounts and other OUs in your organization)
 
 And click on the add button.
 
