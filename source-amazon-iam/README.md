@@ -49,7 +49,18 @@ How to get aws access keys for IAM user read [here](https://docs.aws.amazon.com/
 
 #### Connecting a destination to the source
 Next click on the Add destination button and choose desired destination (BigQuery) from already configured destinations list
-or add a setup a new destination.
+or setup a new destination.
+
+After choosing the destination, select required streams to replicate.
+
+In **Replication frequency** select **manual**.
+
+In **Normalization & Transformation** section choose **Normalized tabular data**. 
+
+Press the **Set up connection**
+
+
+### More about BigQuery
 
 How to setup [BigQuery destination](https://assets-global.website-files.com/6064b31ff49a2d31e0493af1/62605be93d90b81761d850ed_C-iMe0k7C-NEKAmEx5v9SoBx7dH4DG3tyAHsXPL7u5oyfoJs_AK5Rc6X8VY_qE2YKA2Uj_msaf-zyMKkxIaTrFPFsiLK7TfLNhtmnPv6o4PCSak2eFxFWiYgP_s_qXwI7xwUNhRu.png)
 and [here](https://assets-global.website-files.com/6064b31ff49a2d31e0493af1/62605be8e6e7c0d4e06ce983_Oy6pBxVrhiQmZciyM6DT8QDXrK2cEfVyAkgtZmrunNPuusO6e0aQLnIOJ6ltpRD1rLZ-WGwhHIKmLwQmya8E55Kfo0uMbwVTDRSgcnNH984t5ONW-2qVFOYcH0KhDYcfpIZ_Eh2W.png)
