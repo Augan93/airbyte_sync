@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "UserName": {
+      "type": ["string"]
+    },
+    "PolicyName": {
+      "type": ["string"]
+    },
+    "PolicyDocument": {
+      "type": ["null", "object"],
+      "properties": {
+        "Version": {
+          "type": ["string"]
+        },
+        "Statement": {
+          "type": ["null", "array"],
+          "items": {
+            "type": ["null", "object"],
+            "properties": {
+              "Sid": {
+                "type": ["string"]
+              },
+              "Effect": {
+                "type": ["string"]
+              },
+              "Action": {
+                "type": ["null", "array"],
+                "items": {
+                  "type": ["null", "string"]
+                }
+              },
+              "Resource": {
+                "type": ["null", "string"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

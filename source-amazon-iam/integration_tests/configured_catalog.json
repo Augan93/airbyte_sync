@@ -2,11 +2,155 @@
   "streams": [
     {
       "stream": {
-        "name": "table_name",
+        "name": "user_groups",
         "json_schema": {},
         "supported_sync_modes": ["full_refresh"],
         "source_defined_cursor": false,
-        "default_cursor_field": ["column_name"]
+        "default_cursor_field": ["GroupId"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "users",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false,
+        "default_cursor_field": ["UserId"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "roles",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false,
+        "default_cursor_field": ["RoleId"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "role_attached_policies",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "user_attached_policies",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "groups",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false,
+        "default_cursor_field": ["GroupId"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "group_policies",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "group_users",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "managed_policies",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false,
+        "default_cursor_field": ["PolicyId"]
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "policy_attached_entities",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "user_policies",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "role_instance_profiles",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "user_service_credentials",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "credential_reports",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
+      },
+      "sync_mode": "full_refresh",
+      "destination_sync_mode": "overwrite"
+    },
+    {
+      "stream": {
+        "name": "organization_access_reports",
+        "json_schema": {},
+        "supported_sync_modes": ["full_refresh"],
+        "source_defined_cursor": false
       },
       "sync_mode": "full_refresh",
       "destination_sync_mode": "overwrite"

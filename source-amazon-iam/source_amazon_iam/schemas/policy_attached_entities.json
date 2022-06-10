@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "PolicyName": {
+      "type": ["string"]
+    },
+    "PolicyId": {
+      "type": ["string"]
+    },
+    "PolicyArn": {
+      "type": ["string"]
+    },
+    "EntityType": {
+      "type": ["string"]
+    },
+    "EntityName": {
+      "type": ["string"]
+    },
+    "EntityId": {
+      "type": ["string"]
+    }
+  }
+}

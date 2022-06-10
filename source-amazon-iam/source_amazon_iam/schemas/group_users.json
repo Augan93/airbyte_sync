@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "GroupName": {
+      "type": ["string"]
+    },
+    "GroupId": {
+      "type": ["string"]
+    },
+    "Path": {
+      "type": ["string"]
+    },
+    "UserName": {
+      "type": ["string"]
+    },
+    "UserId": {
+      "type": ["string"]
+    },
+    "Arn": {
+      "type": ["string"]
+    },
+    "CreateDate": {
+      "type": ["string"],
+      "format": "date-time"
+    },
+    "PasswordLastUsed": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "PermissionsBoundary": {
+      "type": ["null", "object"],
+      "properties": {
+        "PermissionsBoundaryType": {
+          "type": ["null", "string"]
+        },
+        "PermissionsBoundaryArn": {
+          "type": ["null", "string"]
+        }
+      }
+    },
+    "Tags": {
+      "type": ["null", "array"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

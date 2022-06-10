@@ -3,127 +3,58 @@
 This is the repository for the Amazon Iam source connector, written in Python.
 For information about how to use this connector within Airbyte, see [the documentation](https://docs.airbyte.io/integrations/sources/amazon-iam).
 
-## Local development
+#### Building docker image for the source connector and pushing to the Dockerhub
 
-### Prerequisites
-**To iterate on this connector, make sure to complete this prerequisites section.**
-
-#### Minimum Python version required `= 3.9.0`
-
-#### Build & Activate Virtual Environment and install dependencies
-From this connector directory, create a virtual environment:
 ```
-python -m venv .venv
+cd source-amazon-iam
+docker build . -t <repo_owner>/source-amazon-iam:0.1.0
+docker login
+docker push <repo_owner>/source-amazon-iam:0.1.0
 ```
 
-This will generate a virtualenv for this module in `.venv/`. Make sure this venv is active in your
-development environment of choice. To activate it from the terminal, run:
-```
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-If you are in an IDE, follow your IDE's instructions to activate the virtualenv.
 
-Note that while we are installing dependencies from `requirements.txt`, you should only edit `setup.py` for your dependencies. `requirements.txt` is
-used for editable installs (`pip install -e`) to pull in Python dependencies from the monorepo and will call `setup.py`.
-If this is mumbo jumbo to you, don't worry about it, just put your deps in `setup.py` but install using `pip install -r requirements.txt` and everything
-should work as you expect.
+## Setup the connection
 
-#### Building via Gradle
-From the Airbyte repository root, run:
+#### Adding the source connector to Airbyte instance
+
+From the root of the repo, run
 ```
-./gradlew :airbyte-integrations:connectors:source-amazon-iam:build
+docker-compose up
 ```
 
-#### Create credentials
-**If you are a community contributor**, follow the instructions in the [documentation](https://docs.airbyte.io/integrations/sources/amazon-iam)
-to generate the necessary credentials. Then create a file `secrets/config.json` conforming to the `source_amazon_iam/spec.yaml` file.
-Note that the `secrets` directory is gitignored by default, so there is no danger of accidentally checking in sensitive information.
-See `integration_tests/sample_config.json` for a sample config file.
+Next, go to: Settings -> Sources, and press the button + New connector, it will open a custom connector adding form
+see [custom connector form](https://lh6.googleusercontent.com/UfEol2AKAR-7pKtJnzPNRoEDgOlEfoi9cA3SzB1NboENOZnniaJFfUGcCcVxYtzC8R97tnLwOh28Er5wS_aNujfXCSKUh0K7lhu7xUFYm4oiVCDlFdsdJNvgVihWp0u13ZNyzFuA)
+1. Give the connector display name: Amazon IAM (for example)
+2. Enter Docker repository name: <repo_owner>/source-amazon-iam
+3. Enter Docker image tag: 0.1.0
+4. Enter Connector Documentation URL
+5. Press the Add button
 
-**If you are an Airbyte core member**, copy the credentials in Lastpass under the secret name `source amazon-iam test creds`
-and place them into `secrets/config.json`.
 
-### Locally running the connector
-```
-python main.py spec
-python main.py check --config secrets/config.json
-python main.py discover --config secrets/config.json
-python main.py read --config secrets/config.json --catalog integration_tests/configured_catalog.json
-```
+#### Setup the source connector
 
-### Locally running the connector docker image
+After adding our connector to the airbyte instance, we need to setup for our connection.
+Go to: Sources and press the button +New source
+In the search input, enter Amazon IAM to find our source connector.
 
-#### Build
-First, make sure you build the latest Docker image:
-```
-docker build . -t airbyte/source-amazon-iam:dev
-```
+In the form fill out the following fields:
+1. aws_access_key_id      - access key for IAM user
+2. aws_secret_access_key  - secret key for IAM user
+3. organization_id        - Organization Id
+4. root_id                - Root Id (Root is the parent organizational unit (OU) for all accounts and other OUs in your organization)
 
-You can also build the connector image via Gradle:
-```
-./gradlew :airbyte-integrations:connectors:source-amazon-iam:airbyteDocker
-```
-When building via Gradle, the docker image name and tag, respectively, are the values of the `io.airbyte.name` and `io.airbyte.version` `LABEL`s in
-the Dockerfile.
+And click on the add button.
 
-#### Run
-Then run any of the connector commands as follows:
-```
-docker run --rm airbyte/source-amazon-iam:dev spec
-docker run --rm -v $(pwd)/secrets:/secrets airbyte/source-amazon-iam:dev check --config /secrets/config.json
-docker run --rm -v $(pwd)/secrets:/secrets airbyte/source-amazon-iam:dev discover --config /secrets/config.json
-docker run --rm -v $(pwd)/secrets:/secrets -v $(pwd)/integration_tests:/integration_tests airbyte/source-amazon-iam:dev read --config /secrets/config.json --catalog /integration_tests/configured_catalog.json
-```
-## Testing
-   Make sure to familiarize yourself with [pytest test discovery](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery) to know how your test files and methods should be named.
-First install test dependencies into your virtual environment:
-```
-pip install .[tests]
-```
-### Unit Tests
-To run unit tests locally, from the connector directory run:
-```
-python -m pytest unit_tests
-```
+How to get aws access keys for IAM user read [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey)
 
-### Integration Tests
-There are two types of integration tests: Acceptance Tests (Airbyte's test suite for all source connectors) and custom integration tests (which are specific to this connector).
-#### Custom Integration tests
-Place custom tests inside `integration_tests/` folder, then, from the connector root, run
-```
-python -m pytest integration_tests
-```
-#### Acceptance Tests
-Customize `acceptance-test-config.yml` file to configure tests. See [Source Acceptance Tests](https://docs.airbyte.io/connector-development/testing-connectors/source-acceptance-tests-reference) for more information.
-If your connector requires to create or destroy resources for use during acceptance tests create fixtures for it and place them inside integration_tests/acceptance.py.
-To run your integration tests with acceptance tests, from the connector root, run
-```
-python -m pytest integration_tests -p integration_tests.acceptance
-```
-To run your integration tests with docker
+#### Connecting a destination to the source
+Next click on the Add destination button and choose desired destination (BigQuery) from already configured destinations list
+or add a setup a new destination.
 
-### Using gradle to run tests
-All commands should be run from airbyte project root.
-To run unit tests:
-```
-./gradlew :airbyte-integrations:connectors:source-amazon-iam:unitTest
-```
-To run acceptance and custom integration tests:
-```
-./gradlew :airbyte-integrations:connectors:source-amazon-iam:integrationTest
-```
+How to setup [BigQuery destination](https://assets-global.website-files.com/6064b31ff49a2d31e0493af1/62605be93d90b81761d850ed_C-iMe0k7C-NEKAmEx5v9SoBx7dH4DG3tyAHsXPL7u5oyfoJs_AK5Rc6X8VY_qE2YKA2Uj_msaf-zyMKkxIaTrFPFsiLK7TfLNhtmnPv6o4PCSak2eFxFWiYgP_s_qXwI7xwUNhRu.png)
+and [here](https://assets-global.website-files.com/6064b31ff49a2d31e0493af1/62605be8e6e7c0d4e06ce983_Oy6pBxVrhiQmZciyM6DT8QDXrK2cEfVyAkgtZmrunNPuusO6e0aQLnIOJ6ltpRD1rLZ-WGwhHIKmLwQmya8E55Kfo0uMbwVTDRSgcnNH984t5ONW-2qVFOYcH0KhDYcfpIZ_Eh2W.png)
 
-## Dependency Management
-All of your dependencies should go in `setup.py`, NOT `requirements.txt`. The requirements file is only used to connect internal Airbyte dependencies in the monorepo for local development.
-We split dependencies between two groups, dependencies that are:
-* required for your connector to work need to go to `MAIN_REQUIREMENTS` list.
-* required for the testing need to go to `TEST_REQUIREMENTS` list
+[BigQuery destination tutorial](https://airbyte.com/tutorials/export-google-analytics-to-bigquery)
 
-### Publishing a new version of the connector
-You've checked out the repo, implemented a million dollar feature, and you're ready to share your changes with the world. Now what?
-1. Make sure your changes are passing unit and integration tests.
-1. Bump the connector version in `Dockerfile` -- just increment the value of the `LABEL io.airbyte.version` appropriately (we use [SemVer](https://semver.org/)).
-1. Create a Pull Request.
-1. Pat yourself on the back for being an awesome contributor.
-1. Someone from Airbyte will take a look at your PR and iterate with you to merge it into master.
+
+More about BigQuery destination, [read here](https://docs.airbyte.com/integrations/destinations/bigquery)

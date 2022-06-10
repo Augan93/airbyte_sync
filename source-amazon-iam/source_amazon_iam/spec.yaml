@@ -14,3 +14,9 @@ connectionSpecification:
     aws_secret_access_key:
       type: string
       description: AWS secret access key
+    organization_id:
+      type: string
+      description: AWS Organization ID
+    root_id:
+      type: string
+      description: Root is the parent organizational unit (OU) for all accounts and other OUs in your organization.
