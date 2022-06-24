@@ -51,7 +51,7 @@ class SourceAmazonIam(AbstractSource):
             Groups(client=client),
             GroupPolicies(client=client),
             GroupUsers(client=client),
-            ManagedPolicies(client=client),
+            ManagedPolicies(client=client, fetch_description=True, only_attached=False),
             PolicyAttachedEntities(client=client),
             UserPolicies(client=client),
             RoleInstanceProfiles(client=client),
