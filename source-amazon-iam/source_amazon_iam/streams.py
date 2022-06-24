@@ -212,13 +212,27 @@ class ManagedPolicies(AmazonIamStream):
     primary_key = None
     field = "Policies"
 
+    def __init__(self, client, fetch_description: bool = False, only_attached: bool = False):
+        super().__init__(client)
+        self.fetch_description = fetch_description
+        self.only_attached = only_attached
+
     def read(self, **kwargs):
         kwargs.pop("stream_slice")
-        return self.client.list_policies(
+        response = self.client.list_policies(
             Scope='All',
-            OnlyAttached=True,
+            OnlyAttached=self.only_attached,
             **kwargs
         )
+        if not self.fetch_description:
+            return response
+
+        for record in response[self.field]:
+            response_2 = self.client.get_policy(
+                PolicyArn=record["Arn"]
+            )
+            record.update({"Description": response_2["Policy"]["Description"]})
+        return response
 
 
 class PolicyAttachedEntities(AmazonIamStream):
@@ -261,7 +275,11 @@ class PolicyAttachedEntities(AmazonIamStream):
     def stream_slices(
         self, *, sync_mode: SyncMode, cursor_field: List[str] = None, stream_state: Mapping[str, Any] = None
     ):
-        policies = ManagedPolicies(client=self.client)
+        policies = ManagedPolicies(
+            client=self.client,
+            fetch_description=False,
+            only_attached=True
+        )
         for policy in policies.read_records(sync_mode=SyncMode.full_refresh):
             yield {
                 "policy_name": policy["PolicyName"],
